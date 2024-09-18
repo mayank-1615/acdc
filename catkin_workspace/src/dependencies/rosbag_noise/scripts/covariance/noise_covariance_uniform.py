@@ -24,7 +24,6 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 #  ==============================================================================
-#
 
 import random
 import sys
@@ -38,7 +37,7 @@ from definitions.msg import IkaObjectList, IkaSensorStamp
 # then execute:
 #  rosrun rosbag_noise main.py bag_file.bag
 
-def make_noise(object_list, mode):
+def make_noise(object_list, mode, noise_type='gaussian'):
     noise_list = IkaObjectList()
     noise_list.header = object_list.header
 
@@ -49,61 +48,46 @@ def make_noise(object_list, mode):
 
     for reference_object in object_list.objects:
         obj = deepcopy(reference_object)
-        if mode == 'camera':
-            obj.fMean = list(obj.fMean)
-            obj.fMean[0] += random.gauss(0, 0.6)
-            obj.fMean[1] += random.gauss(0, 0.2)
-            obj.IdType = 4  # CAR
-            obj.IdExternal = 16  # CAMERA
-            obj.bObjectMeasured = 1
+        obj.fMean = list(obj.fMean)
+        obj.fCovariance = list(obj.fCovariance)
 
-            obj.fCovariance = list(obj.fCovariance)
-            obj.fCovariance[0] = 0.36
-            obj.fCovariance[12] = 0.04
-            obj.fCovariance[24] = 0.01
-            obj.fCovariance[36] = 0.01
-            obj.fCovariance[48] = 0.01
-            obj.fCovariance[60] = 0.01
-            obj.fCovariance[72] = 0.01
-            obj.fCovariance[84] = 0.01
-            obj.fCovariance[96] = 0.01
-            obj.fCovariance[108] = 0.01
-            obj.fCovariance[120] = 0.01
+        if noise_type == 'gaussian':
+            if mode == 'camera':
+                obj.fMean[0] += random.gauss(0, 0.6)
+                obj.fMean[1] += random.gauss(0, 0.2)
+                obj.fCovariance[0] = 0.6**2
+                obj.fCovariance[12] = 0.2**2
+            elif mode == 'radar':
+                obj.fMean[0] += random.gauss(0, 0.2)
+                obj.fMean[1] += random.gauss(0, 0.6)
+                obj.fCovariance[0] = 0.2**2
+                obj.fCovariance[12] = 0.6**2
 
-            sensor_stamp = IkaSensorStamp()
-            sensor_stamp.IdSensor = obj.IdExternal
-            sensor_stamp.IdObjectWithinSensor = obj.IdInternal
-            sensor_stamp.measuredStamp = object_list.header.stamp
-            obj.measHist.append(sensor_stamp)
+        elif noise_type == 'uniform':
+            if mode == 'camera':
+                obj.fMean[0] += random.uniform(-0.6, 0.6)
+                obj.fMean[1] += random.uniform(-0.2, 0.2)
+                obj.fCovariance[0] = (0.6**2) / 3  # Variance for uniform distribution
+                obj.fCovariance[12] = (0.2**2) / 3
+            elif mode == 'radar':
+                obj.fMean[0] += random.uniform(-0.2, 0.2)
+                obj.fMean[1] += random.uniform(-0.6, 0.6)
+                obj.fCovariance[0] = (0.2**2) / 3
+                obj.fCovariance[12] = (0.6**2) / 3
 
-        elif mode == 'radar':
-            obj.fMean = list(obj.fMean)
-            obj.fMean[0] += random.gauss(0, 0.2)
-            obj.fMean[1] += random.gauss(0, 0.6)
-            obj.IdType = 4  # CAR
-            obj.IdExternal = 14  # RADAR
-            obj.fMean[7] -= 1.5
-            obj.fMean[8] -= 1
-            obj.bObjectMeasured = 1
+        # Other parameters and covariances, leaving as is or with small constant noise
+        for i in range(24, 121, 12):
+            obj.fCovariance[i] = 0.01
 
-            obj.fCovariance = list(obj.fCovariance)
-            obj.fCovariance[0] = 0.04
-            obj.fCovariance[12] = 0.36
-            obj.fCovariance[24] = 0.01
-            obj.fCovariance[36] = 0.01
-            obj.fCovariance[48] = 0.01
-            obj.fCovariance[60] = 0.01
-            obj.fCovariance[72] = 0.01
-            obj.fCovariance[84] = 1.2
-            obj.fCovariance[96] = 1.0
-            obj.fCovariance[108] = 0.01
-            obj.fCovariance[120] = 0.01
+        obj.IdType = 4  # CAR
+        obj.IdExternal = noise_list.IdSource
+        obj.bObjectMeasured = 1
 
-            sensor_stamp = IkaSensorStamp()
-            sensor_stamp.IdSensor = obj.IdExternal
-            sensor_stamp.IdObjectWithinSensor = obj.IdInternal
-            sensor_stamp.measuredStamp = object_list.header.stamp
-            obj.measHist.append(sensor_stamp)
+        sensor_stamp = IkaSensorStamp()
+        sensor_stamp.IdSensor = obj.IdExternal
+        sensor_stamp.IdObjectWithinSensor = obj.IdInternal
+        sensor_stamp.measuredStamp = object_list.header.stamp
+        obj.measHist.append(sensor_stamp)
 
         noise_list.objects.append(obj)
 
@@ -116,7 +100,7 @@ def main():
     input_objectlist_topic = "/fusion/ikaObjectList"
     input_objectlist_topic_output = "/sensors/reference/ikaObjectList"
 
-    output_name = sys.argv[1][:-4] + '_gaussian_noise.bag'
+    output_name = sys.argv[1][:-4] + '_noise.bag'
     bag = rosbag.Bag(output_name, 'w')
     output_objectlist_topic_camera = '/sensors/camera_front/ikaObjectList'
     output_objectlist_topic_radar = '/sensors/radar_front/ikaObjectList'
@@ -125,13 +109,20 @@ def main():
         for topic, msg, t in input_bag.read_messages():
             if topic == input_objectlist_topic:
                 bag.write(input_objectlist_topic_output, msg, t)
-                # bag.write('/clock', msg.header.stamp, t)
 
-                estimated_objects_camera = make_noise(msg, 'camera')
-                bag.write(output_objectlist_topic_camera, estimated_objects_camera, t)
+                # Add Gaussian noise
+                estimated_objects_camera_gaussian = make_noise(msg, 'camera', 'gaussian')
+                bag.write(output_objectlist_topic_camera + "_gaussian", estimated_objects_camera_gaussian, t)
 
-                estimated_objects_radar = make_noise(msg, 'radar')
-                bag.write(output_objectlist_topic_radar, estimated_objects_radar, t)
+                estimated_objects_radar_gaussian = make_noise(msg, 'radar', 'gaussian')
+                bag.write(output_objectlist_topic_radar + "_gaussian", estimated_objects_radar_gaussian, t)
+
+                # Add Uniform noise
+                estimated_objects_camera_uniform = make_noise(msg, 'camera', 'uniform')
+                bag.write(output_objectlist_topic_camera + "_uniform", estimated_objects_camera_uniform, t)
+
+                estimated_objects_radar_uniform = make_noise(msg, 'radar', 'uniform')
+                bag.write(output_objectlist_topic_radar + "_uniform", estimated_objects_radar_uniform, t)
             else:
                 bag.write(topic, msg, t)
     finally:

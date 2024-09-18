@@ -1,0 +1,8 @@
+<launch>
+    <!-- Start playing the bag file -->
+    <node pkg="rosbag" type="play" name="rosbag_play" args="-l /home/rosuser/ws/bag/acdc_fusion_guidance_laplacetrialnoise.bag"/>
+
+    <!-- Start recording specified topics into a new bag file -->
+    <node pkg="rosbag" type="record" name="rosbag_record" args="-O /home/rosuser/ws/bag/acdc_fusion_guidance_noise_trial_ekf_laplace.bag /sensors/fusion/ikaObjectList /sensors/reference/ikaObjectList"/>
+</launch>
+

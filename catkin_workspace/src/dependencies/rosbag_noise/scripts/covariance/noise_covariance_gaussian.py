@@ -58,8 +58,8 @@ def make_noise(object_list, mode):
             obj.bObjectMeasured = 1
 
             obj.fCovariance = list(obj.fCovariance)
-            obj.fCovariance[0] = 0.36
-            obj.fCovariance[12] = 0.04
+            obj.fCovariance[0] = 0.6**2
+            obj.fCovariance[12] = 0.2**2
             obj.fCovariance[24] = 0.01
             obj.fCovariance[36] = 0.01
             obj.fCovariance[48] = 0.01
@@ -87,17 +87,17 @@ def make_noise(object_list, mode):
             obj.bObjectMeasured = 1
 
             obj.fCovariance = list(obj.fCovariance)
-            obj.fCovariance[0] = 0.04
-            obj.fCovariance[12] = 0.36
-            obj.fCovariance[24] = 0.01
-            obj.fCovariance[36] = 0.01
-            obj.fCovariance[48] = 0.01
-            obj.fCovariance[60] = 0.01
-            obj.fCovariance[72] = 0.01
-            obj.fCovariance[84] = 1.2
-            obj.fCovariance[96] = 1.0
-            obj.fCovariance[108] = 0.01
-            obj.fCovariance[120] = 0.01
+            obj.fCovariance[0] = 0.2**2  # Variance for x position
+            obj.fCovariance[12] = 0.6**2  # Variance for y position
+ #           obj.fCovariance[24] = 0.01
+ #           obj.fCovariance[36] = 0.01
+ #           obj.fCovariance[48] = 0.01
+ #           obj.fCovariance[60] = 0.01
+ #           obj.fCovariance[72] = 0.01
+ #           obj.fCovariance[84] = 1.2
+ #           obj.fCovariance[96] = 1.0
+ #           obj.fCovariance[108] = 0.01
+ #           obj.fCovariance[120] = 0.01
 
             sensor_stamp = IkaSensorStamp()
             sensor_stamp.IdSensor = obj.IdExternal
@@ -116,7 +116,7 @@ def main():
     input_objectlist_topic = "/fusion/ikaObjectList"
     input_objectlist_topic_output = "/sensors/reference/ikaObjectList"
 
-    output_name = sys.argv[1][:-4] + '_gaussian_noise.bag'
+    output_name = sys.argv[1][:-4] + '_noise.bag'
     bag = rosbag.Bag(output_name, 'w')
     output_objectlist_topic_camera = '/sensors/camera_front/ikaObjectList'
     output_objectlist_topic_radar = '/sensors/radar_front/ikaObjectList'

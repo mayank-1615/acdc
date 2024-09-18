@@ -2,11 +2,11 @@ fusion_passat: #used in FusionConstants.h and FusionConstants.cpp
     constants:
         existence_probability_loss_rate: 1.0            # unit: 100% existence probability per second. How quickly are non-measured objects forgotten?
         chosen_distance_measure: 1                      # 1 - Mahalanobis distance, 2 - Intersection over Union 
-        iou_overlap_threshold: 0.01                     # below this overlap threshold the objects are not matched, esentially it should be just higher than 0, then highest iou chosen anyway
+        iou_overlap_threshold: 0.001                     # below this overlap threshold the objects are not matched, esentially it should be just higher than 0, then highest iou chosen anyway
         mahalanobis_threshold: 6.0                      # unit: std devs of innovation. should be 2 or 3 (95% or 99% error ellipses) to be realistic.
         mahalanobis_global_threshold: 2.0               # currently not supported! for global-to-global fusion.
-        existence_probability_output_threshold: 0.001   # below this, global objects are not outputted (but may be kept internally).
-        existence_probability_delete_threshold: 0.001   # below this, global objects get deleted.
+        existence_probability_output_threshold: 0.90   # 0.95 for UKF, 0.9 for EKF/KF
+        existence_probability_delete_threshold: 0.90   # 0.95 for UKF, 0.9 for EKF/KF
         measurement_history_threshold_sec: 0.2          # time in seconds after which fused objects forget by whom they have been measured
         time_jump:                                      # global object list is cleared when ROS time jumps of greater / smaller than this get detected
             forward_threshold_sec: 5.0

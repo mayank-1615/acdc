@@ -29,14 +29,11 @@
 import random
 import sys
 from copy import deepcopy
+import numpy as np  # Added for Laplace noise generation
 
 import rosbag
 from definitions.msg import IkaObjectList, IkaSensorStamp
 
-
-# to execute this script, build the catkin package with its dependencies.
-# then execute:
-#  rosrun rosbag_noise main.py bag_file.bag
 
 def make_noise(object_list, mode):
     noise_list = IkaObjectList()
@@ -49,17 +46,20 @@ def make_noise(object_list, mode):
 
     for reference_object in object_list.objects:
         obj = deepcopy(reference_object)
+        obj.fMean = list(obj.fMean)
+        obj.fCovariance = list(obj.fCovariance)
+
         if mode == 'camera':
-            obj.fMean = list(obj.fMean)
-            obj.fMean[0] += random.gauss(0, 0.6)
-            obj.fMean[1] += random.gauss(0, 0.2)
+            # Applying Laplace noise to the mean values
+            obj.fMean[0] += np.random.laplace(0, 0.6)  # Laplace noise for x position
+            obj.fMean[1] += np.random.laplace(0, 0.2)  # Laplace noise for y position
             obj.IdType = 4  # CAR
             obj.IdExternal = 16  # CAMERA
             obj.bObjectMeasured = 1
 
-            obj.fCovariance = list(obj.fCovariance)
-            obj.fCovariance[0] = 0.36
-            obj.fCovariance[12] = 0.04
+            # Covariance remains the same, or you can adjust based on the new noise characteristics
+            obj.fCovariance[0] = 0.6**2
+            obj.fCovariance[12] = 0.2**2
             obj.fCovariance[24] = 0.01
             obj.fCovariance[36] = 0.01
             obj.fCovariance[48] = 0.01
@@ -77,18 +77,18 @@ def make_noise(object_list, mode):
             obj.measHist.append(sensor_stamp)
 
         elif mode == 'radar':
-            obj.fMean = list(obj.fMean)
-            obj.fMean[0] += random.gauss(0, 0.2)
-            obj.fMean[1] += random.gauss(0, 0.6)
+            # Applying Laplace noise to the mean values
+            obj.fMean[0] += np.random.laplace(0, 0.2)  # Laplace noise for x position
+            obj.fMean[1] += np.random.laplace(0, 0.6)  # Laplace noise for y position
             obj.IdType = 4  # CAR
             obj.IdExternal = 14  # RADAR
             obj.fMean[7] -= 1.5
             obj.fMean[8] -= 1
             obj.bObjectMeasured = 1
 
-            obj.fCovariance = list(obj.fCovariance)
-            obj.fCovariance[0] = 0.04
-            obj.fCovariance[12] = 0.36
+            # Covariance remains the same, or you can adjust based on the new noise characteristics
+            obj.fCovariance[0] = 0.2**2
+            obj.fCovariance[12] = 0.6**2
             obj.fCovariance[24] = 0.01
             obj.fCovariance[36] = 0.01
             obj.fCovariance[48] = 0.01
@@ -116,7 +116,7 @@ def main():
     input_objectlist_topic = "/fusion/ikaObjectList"
     input_objectlist_topic_output = "/sensors/reference/ikaObjectList"
 
-    output_name = sys.argv[1][:-4] + '_gaussian_noise.bag'
+    output_name = sys.argv[1][:-4] + '_noise.bag'
     bag = rosbag.Bag(output_name, 'w')
     output_objectlist_topic_camera = '/sensors/camera_front/ikaObjectList'
     output_objectlist_topic_radar = '/sensors/radar_front/ikaObjectList'
@@ -125,7 +125,6 @@ def main():
         for topic, msg, t in input_bag.read_messages():
             if topic == input_objectlist_topic:
                 bag.write(input_objectlist_topic_output, msg, t)
-                # bag.write('/clock', msg.header.stamp, t)
 
                 estimated_objects_camera = make_noise(msg, 'camera')
                 bag.write(output_objectlist_topic_camera, estimated_objects_camera, t)
@@ -142,3 +141,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

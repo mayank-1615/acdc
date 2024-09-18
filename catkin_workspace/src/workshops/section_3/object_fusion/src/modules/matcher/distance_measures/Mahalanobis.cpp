@@ -94,10 +94,22 @@ float MahalanobisCalculator::distance(
   // P_S_diag.asDiagonal(); // P_S
   
   /** START TASK 2.2 CODE HERE **/
+    const Eigen::VectorXf &x_hat_S = IkaUtilities::getEigenStateVec(&measured_object);
+  const Eigen::VectorXf &x_hat_G = IkaUtilities::getEigenStateVec(&global_object);
 
+  // reduce variances from complete state dimensions to dimensions in which association should happen
+  const Eigen::VectorXf &P_S_diag = IkaUtilities::getEigenVarianceVec(&measured_object);
+  const Eigen::MatrixXf measured_cov = dim_red_mat * P_S_diag.asDiagonal() * dim_red_mat.transpose();
+  const Eigen::MatrixXf global_cov = dim_red_mat * global_object.P() * dim_red_mat.transpose();
 
+  const Eigen::VectorXf innovation = dim_red_mat * (x_hat_S - x_hat_G);
+  Eigen::MatrixXf innovation_cov = measured_cov + global_cov;
+
+  float mahalanobis_dist = std::sqrt(innovation.transpose() * innovation_cov.inverse() * innovation);
+
+  return mahalanobis_dist;
   /** END TASK 2.2 CODE HERE **/
-  return 1.f;
+  //return 1.f;
 }
 
 void MahalanobisCalculator::uncorrelate_common_process_noise(

@@ -1,60 +1,62 @@
-![](assets/header_image.png)
+# ACDC Research Project - Processing of Traffic Light Status Information in MPC-Planner
 
-[![Build Main](https://github.com/ika-rwth-aachen/acdc/actions/workflows/build.yml/badge.svg)](https://github.com/ika-rwth-aachen/acdc/actions/workflows/build.yml)
+## Introduction
+This repository aims to implement various Gausian filters - Kalman Filter(KF), Extended Kalman Filter(EKF), and Unscented Kalman Filter(UKF). It also deals with addition of noise measurements to camera and radar sensor measurements that aims to reduce Mean Squared Error (MSE) for the fused object after object tracking. The source code for the filtering techniques and noise generation scripts are built upon existing program by [RWTH Institute for Automotive Engineering](https://github.com/ika-rwth-aachen). This project is under the [ACDC Research Project Course](https://github.com/ika-rwth-aachen/acdc-research-projects) by the IKA, RWTH Aachen University. 
 
-# Automated and Connected Driving Challenges (ACDC)
+This project aims to:
+1. Implement EKF and UKF source codes to the ROS nodes. 
+2. apply different kinds of noise distributions to sensor measurement data.
 
-This repository belongs to the **Automated and Connected Driving Challenges (ACDC)**, a Massive Open Online Course (MOOC) on [edX.org](https://www.edx.org/course/automated-and-connected-driving-challenges), teaching how to solve current challenges in the field of automated and connected mobility. This repository contains programming tasks relating to the [Robot Operating System (ROS)]((https://ros.org/)).
+A detailed documentation regarding this project can be found [here]().
 
-Watch the **Course Trailer** for a quick introduction to the course:
+## Getting started
 
-[![Watch the video](assets/ACDC_YT_Thumbnail.png)](https://www.youtube.com/watch?v=XR2uBMVX1As)
-
-**Enroll** in the course **for free** [here](https://www.edx.org/course/automated-and-connected-driving-challenges) and learn how to shape future automated and connected mobility!
-
-The course is taught by the [Institute for Automotive Engineering (ika)](https://www.ika.rwth-aachen.de/) of [RWTH Aachen University](https://rwth-aachen.de) in Germany.
-
-## Repository Content
-For the complete course content including the solutions to all programming tasks in the course, please enroll in the course. 
-
-If you want to get to know the programming tasks of this repository, you can find instructions in the Repository's [**Wiki**](https://github.com/ika-rwth-aachen/acdc/wiki).
-
-We offer additional programming tasks in the form of Jupyter Notebooks [here](https://github.com/ika-rwth-aachen/acdc-notebooks).
-
-## Quick Start
-
-All programming tasks can be run inside of a Docker container, which we provide. 
-
-0. Follow all steps described under [Installation](https://github.com/ika-rwth-aachen/acdc/wiki#installations) in this repository's Wiki.
+### Installation
+0. Follow all steps described under [Installation](https://github.com/ika-rwth-aachen/acdc/wiki#installations) in this repository's Wiki to setup your coding environment.
 
 1. Clone this repository with the contained submodules:
     ```bash
-    git clone --recurse-submodules https://github.com/ika-rwth-aachen/acdc.git
+    git clone --recurse-submodules https://github.com/Ihrer73/acdc.git
     ```
 
-2. Pull the Docker image that is needed to run our tasks:
+2. Pull the Docker image that is needed to run our tasks.:
     ```bash
-    docker pull rwthika/acdc:ros1
+    docker pull rwthika/acdc:latest
     ```
 
-3. If you also want to execute our new ROS2 tasks, then you would also need to pull the following image:
-    ```bash
-    docker pull rwthika/acdc:ros2
-    ```
-
-4. **Start ROS1:** In a terminal, navigate to the Docker directory of this repository and launch the ACDC Docker container with the provided run script:
+3. In a terminal, navigate to the Docker directory of this repository and launch the ACDC Docker container with the provided run script:
     ```bash
     # acdc/docker
-    ./ros1_run.sh
+    ./run.sh
     ```
+    Once you run this script, the docker container will start running. When this is done, proceed to the **Quick start** section. 
+    
+### Quick start
 
-5. **Start ROS2:** In a terminal, navigate to the Docker directory of this repository and launch the ACDC Docker container with the provided run script:
+1. Open a new terminal and run the ACDC Docker container again. After that, compile the C++ ROS code and source the `setup.bash` file with the following script:
     ```bash
-    # acdc/docker
-    ./ros2_run.sh
+    catkin build
+    source devel/setup.bash
     ```
+2. The simulations can be launched now. They can be executed with their respective launch commands:
 
+   Launch playback node:
+   ```bash
+   roslaunch acdc_launchpack bag_playback.launch
+   ```
+   
+   Launch RVIZ and object_fusion_wrapper node:
+   ```bash
+   roslaunch object_fusion_wrapper fusion.launch
+   ```
+
+    Play bag files:
+   ```bash
+   rosbag play -l ../bag/acdc_fusion_guidaance_noise.bag
+   ```
+
+**Note:** The source code files *StateFuser.cpp* and *StatePredictor.cpp* must be changed for different filters. 
 
 ## License
 
-Copyright (c) 2023-2024, Institute for Automotive Engineering (ika), RWTH University
+Copyright (c) 2022, Institute for Automotive Engineering (ika), RWTH University

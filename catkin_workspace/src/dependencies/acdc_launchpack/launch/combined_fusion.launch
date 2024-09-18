@@ -1,0 +1,18 @@
+<launch>
+    <!-- Launch object fusion wrapper -->
+    <node pkg="object_fusion_wrapper" type="fusion" name="object_fusion_wrapper" launch-prefix="roslaunch">
+        <rosparam command="load" file="$(find object_fusion_wrapper)/config/fusion.launch"/>
+    </node>
+
+    <!-- Launch bag playback -->
+    <node pkg="acdc_launchpack" type="bag_playback" name="bag_playback" launch-prefix="roslaunch">
+        <rosparam command="load" file="$(find acdc_launchpack)/launch/bag_playback.launch"/>
+    </node>
+
+    <!-- Start playing the bag file -->
+    <node pkg="rosbag" type="play" name="rosbag_play" args="-l /home/rosuser/ws/bag/acdc_fusion_guidance_noise.bag"/>
+
+    <!-- Start recording specified topics into a new bag file -->
+    <node pkg="rosbag" type="record" name="rosbag_record" args="-O new_fusion_guidance_noise_ekf.bag /sensors/fusion/ikaObjectList /sensors/reference/ikaObjectList"/>
+</launch>
+

@@ -52,7 +52,7 @@ ikaFusLib::ikaFusLib() {
   modules_.push_back(std::unique_ptr<ExistenceFuser>(new ExistenceFuser(data_, "ExistenceFuser")));
   modules_.push_back(std::unique_ptr<ClassificationFuser>(new ClassificationFuser(data_, "ClassificationFuser")));
 
-  // manager
+  // manager bleh
   modules_.push_back(std::unique_ptr<ObjectCreator>(new ObjectCreator(data_, "GlobalObjectCreator")));
   modules_.push_back(std::unique_ptr<MeasurementHistorian>(new MeasurementHistorian(data_, "MeasurementHistorian")));
 }

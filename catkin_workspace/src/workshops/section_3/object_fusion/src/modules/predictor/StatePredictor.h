@@ -30,8 +30,10 @@
  * @brief  Predict the global objects' previous states to the current time.
  * @details Uses the state transition matrix.
  */
-class StatePredictor : public AbstractFusionModule{
+class StatePredictor : public AbstractFusionModule {
  private:
+  Eigen::VectorXf stateTransitionFunction(const Eigen::VectorXf &x, float dt);
+  Eigen::MatrixXf jacobianFunction(const Eigen::VectorXf &x, float dt);
 
  public:
   StatePredictor(std::shared_ptr<Data> data, std::string name);

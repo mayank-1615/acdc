@@ -58,10 +58,34 @@ float IouCalculator::extendedDistance(
 float IouCalculator::computeIoU(IouCalculator::Bbox &a, IouCalculator::Bbox &b)
 {
   /** START TASK 2.1 CODE HERE **/
+  // The order of input bounding boxes a,b doesn't matter
+  // Get the intersection bounding box 
+  IouCalculator::Bbox inter; 
+  inter.top_left_x = std::min(a.top_left_x, b.top_left_x);
+  inter.top_left_y = std::min(a.top_left_y, b.top_left_y);
+  inter.bottom_right_x = std::max(a.bottom_right_x, b.bottom_right_x);
+  inter.bottom_right_y = std::max(a.bottom_right_y, b.bottom_right_y);
+  inter.length = inter.top_left_x - inter.bottom_right_x;
+  inter.width = inter.top_left_y - inter.bottom_right_y;
 
+  // Edge cases with bbox being a line or no overlap between bboxes 
+  bool is_no_overlap = inter.length <= 0 || inter.width <= 0;
+  bool is_either_bbox_line = a.length == 0 || a.width == 0 || b.length == 0 || b.width == 0;
+  if (is_no_overlap || is_either_bbox_line){
+    return 0.f; // will be later on set to -1, as below threshold
+  }
+
+  // Compute bbox areas 
+  float area_inter = inter.length * inter.width;
+  float area_a = a.length * a.width;
+  float area_b = b.length * b.width;
+  float area_combined = area_a + area_b - area_inter;
+
+  float iou = area_inter / area_combined;
+  return iou;
 
   /** END TASK 2.1 CODE HERE **/
-  return 0.f;
+  //return 0.f;
 }
 
 

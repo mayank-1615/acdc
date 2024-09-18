@@ -28,7 +28,7 @@
 #include <iostream>
 
 Matcher::Matcher(std::shared_ptr<Data> data, std::string name)
-    : AbstractFusionModule(std::move(data), name) {
+    : AbstractFusionModule(std::move(data), std::move(name)) {
   mahalanobis_calculator = new MahalanobisCalculator();
   iou_calculator = new IouCalculator();
   auction = new Auction();

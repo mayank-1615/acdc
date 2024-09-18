@@ -32,6 +32,7 @@ Eigen::MatrixXf StateFuser::constructMeasurementMatrix() {
   Eigen::VectorXf variance;
   bool foundValidObject = false;
   for (auto &measuredObject: data_->object_list_measured.objects) {
+    // IkaUtilities::convertMotionModel(measuredObject, 4);	
     if (measuredObject.bObjectValid) {
       variance = IkaUtilities::getEigenVarianceVec(&measuredObject);
       foundValidObject = true;
@@ -62,10 +63,13 @@ Eigen::MatrixXf StateFuser::constructMeasurementMatrix() {
   return C;
 }
 
-
 void StateFuser::runSingleSensor() {
-
+  // Construct measurement matrix C
   Eigen::MatrixXf C = constructMeasurementMatrix();
+  if (C.rows() == 0 || C.cols() == 0) {
+    // No valid measurement matrix, exit the function
+    return;
+  }
 
   int count = -1;
   for (auto &globalObject : data_->object_list_fused.objects) {
@@ -74,7 +78,6 @@ void StateFuser::runSingleSensor() {
     auto x_hat_G = IkaUtilities::getEigenStateVec(&globalObject); // predicted global state
 
     int measurementIndex = data_->associated_measured[count];
-
     if (measurementIndex < 0) {
       continue; // no associated measurement
     }
@@ -82,9 +85,34 @@ void StateFuser::runSingleSensor() {
     definitions::IkaObject& measuredObject = data_->object_list_measured.objects[measurementIndex];
     auto P_S_diag = IkaUtilities::getEigenVarianceVec(&measuredObject); // predicted measured state variance
 
-    /** START TASK 3 CODE HERE **/
+    auto R_diag = C * P_S_diag;
+    Eigen::MatrixXf R = R_diag.asDiagonal();
+    Eigen::MatrixXf C_transposed = C.transpose();
 
+    // Measurement prediction (z_pred)
+    Eigen::VectorXf z_pred = C * x_hat_G;
 
-    /** END TASK 3 CODE HERE **/
+    // Actual measurement (z)
+    Eigen::VectorXf x_hat_S = IkaUtilities::getEigenStateVec(&measuredObject);
+    Eigen::VectorXf z = C * x_hat_S;
+
+    // Compute the Jacobian of the measurement function H (same as C in this case)
+    Eigen::MatrixXf H = C;
+
+    // Innovation covariance
+    Eigen::MatrixXf S = (H * globalObject.P() * H.transpose() + R);
+
+    // Kalman gain
+    Eigen::MatrixXf K = globalObject.P() * H.transpose() * S.inverse();
+    // Print the Kalman gain matrix
+    std::cout << "Kalman gain matrix K:\n" << K << std::endl;
+
+    // Update state estimate
+    x_hat_G = x_hat_G + K * (z - z_pred); // value of x is edited in place of ikaObject memory
+
+    // Update global matrix P.
+    Eigen::MatrixXf K_times_H = K * H;
+    Eigen::MatrixXf Identity = Eigen::MatrixXf::Identity(K_times_H.rows(), K_times_H.cols());
+    globalObject.P() = (Identity - K_times_H) * globalObject.P();
   }
 }

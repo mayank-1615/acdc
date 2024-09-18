@@ -29,6 +29,7 @@
 import random
 import sys
 from copy import deepcopy
+import numpy as np
 
 import rosbag
 from definitions.msg import IkaObjectList, IkaSensorStamp
@@ -51,8 +52,8 @@ def make_noise(object_list, mode):
         obj = deepcopy(reference_object)
         if mode == 'camera':
             obj.fMean = list(obj.fMean)
-            obj.fMean[0] += random.gauss(0, 0.6)
-            obj.fMean[1] += random.gauss(0, 0.2)
+            obj.fMean[0] += np.random.standard_cauchy()*0.6
+            obj.fMean[1] += np.random.standard_cauchy()*0.2
             obj.IdType = 4  # CAR
             obj.IdExternal = 16  # CAMERA
             obj.bObjectMeasured = 1
@@ -78,8 +79,8 @@ def make_noise(object_list, mode):
 
         elif mode == 'radar':
             obj.fMean = list(obj.fMean)
-            obj.fMean[0] += random.gauss(0, 0.2)
-            obj.fMean[1] += random.gauss(0, 0.6)
+            obj.fMean[0] += np.random.standard_cauchy()*0.2
+            obj.fMean[1] += np.random.standard_cauchy()*0.6
             obj.IdType = 4  # CAR
             obj.IdExternal = 14  # RADAR
             obj.fMean[7] -= 1.5
@@ -116,7 +117,7 @@ def main():
     input_objectlist_topic = "/fusion/ikaObjectList"
     input_objectlist_topic_output = "/sensors/reference/ikaObjectList"
 
-    output_name = sys.argv[1][:-4] + '_gaussian_noise.bag'
+    output_name = sys.argv[1][:-4] + '_cauchynosie.bag'
     bag = rosbag.Bag(output_name, 'w')
     output_objectlist_topic_camera = '/sensors/camera_front/ikaObjectList'
     output_objectlist_topic_radar = '/sensors/radar_front/ikaObjectList'
