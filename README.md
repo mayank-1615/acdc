@@ -40,25 +40,28 @@ A detailed documentation regarding this project can be found [here]().
     ```
 2. The simulations can be launched now. They can be executed with their respective launch commands:
 
-   Launch playback node:
+   Launch RVIZ playback node:
    ```bash
    roslaunch acdc_launchpack bag_playback.launch
    ```
    
-   Launch RVIZ and object_fusion_wrapper node:
+   Launch and object_fusion_wrapper node:
    ```bash
    roslaunch object_fusion_wrapper fusion.launch
    ```
-
-    Play bag files:
+   
+   Play bag files to visualize fused object:
    ```bash
    rosbag play -l ../bag/Bagfiles_original/KF_bagfiles/acdc_fusion_guidance_noise_gaussian_noise.bag
    or 
-   rosbag play -l ~/ws/bag/Bagfiles_original/KF_bagfiles/acdc_fusion_guidance_noise_gaussian_noise.bag
+   rosbag play -l /home/rosuser/ws/bag/Bagfiles_original/KF_bagfiles/acdc_fusion_guidance_noise_gaussian_noise.bag
    ```
-	The structure of the bag files have been explained in [README_bagfiles_structure.md](https://github.com/mananvora/acdc/tree/main/bag/README_bagfiles_structure.md).
-	
-**Note:** The source code files *StateFuser.cpp* and *StatePredictor.cpp* must be changed for different filters. 
+  To find which bag file to be played please look into [README_bagfiles_structure.md](https://github.com/mananvora/acdc/tree/main/bag/README_bagfiles_structure.md).
+   
+- Recording of the bag files is further explained in [README.md](https://github.com/mananvora/acdc/tree/main/catkin_workspace/src/workshops/section_3/object_fusion_wrapper)
+
+
+**Note:** The source code files *StateFuser.cpp* and *StatePredictor.cpp* must be changed for different filters. This has explained [here](https://github.com/mananvora/acdc/blob/main/catkin_workspace/src/workshops/section_3/object_fusion/README.md)
 
 ## License
 
