@@ -29,7 +29,7 @@
 import random
 import sys
 from copy import deepcopy
-import numpy as np
+import numpy as np 
 
 import rosbag
 from definitions.msg import IkaObjectList, IkaSensorStamp
@@ -37,7 +37,8 @@ from definitions.msg import IkaObjectList, IkaSensorStamp
 
 # to execute this script, build the catkin package with its dependencies.
 # then execute:
-#  rosrun rosbag_noise main.py bag_file.bag
+# rosrun rosbag_noise laplace.py ~/ws/bag/bag/acdc_fusion_guidance.bag
+
 
 def make_noise(object_list, mode):
     noise_list = IkaObjectList()
@@ -52,8 +53,8 @@ def make_noise(object_list, mode):
         obj = deepcopy(reference_object)
         if mode == 'camera':
             obj.fMean = list(obj.fMean)
-            obj.fMean[0] += np.random.laplace(-0.2, 2)
-            obj.fMean[1] += np.random.laplace(-0.2, 2)
+            obj.fMean[0] += np.random.laplace(0.05, 0.4)
+            obj.fMean[1] += np.random.laplace(-0.05, 0.4)
             obj.IdType = 4  # CAR
             obj.IdExternal = 16  # CAMERA
             obj.bObjectMeasured = 1
@@ -79,8 +80,8 @@ def make_noise(object_list, mode):
 
         elif mode == 'radar':
             obj.fMean = list(obj.fMean)
-            obj.fMean[0] += np.random.laplace(-0.2, 2)
-            obj.fMean[1] += np.random.laplace(-0.2, 2)
+            obj.fMean[0] += np.random.laplace(-0.05, 0.4)
+            obj.fMean[1] += np.random.laplace(0.05, 0.4)
             obj.IdType = 4  # CAR
             obj.IdExternal = 14  # RADAR
             obj.fMean[7] -= 1.5
@@ -117,7 +118,7 @@ def main():
     input_objectlist_topic = "/fusion/ikaObjectList"
     input_objectlist_topic_output = "/sensors/reference/ikaObjectList"
 
-    output_name = sys.argv[1][:-4] + '_laplacenoise.bag'
+    output_name = '~/ws/bag/bag/Bagfiles_original/KF_bagfiles/' + input_name.split('/')[-1][:-4] + '_laplace_noise.bag'
     bag = rosbag.Bag(output_name, 'w')
     output_objectlist_topic_camera = '/sensors/camera_front/ikaObjectList'
     output_objectlist_topic_radar = '/sensors/radar_front/ikaObjectList'

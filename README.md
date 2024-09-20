@@ -1,4 +1,4 @@
-# ACDC Research Project - Processing of Traffic Light Status Information in MPC-Planner
+# ACDC Research Project - Advanced Filtering for Object Tracking
 
 ## Introduction
 This repository aims to implement various Gausian filters - Kalman Filter(KF), Extended Kalman Filter(EKF), and Unscented Kalman Filter(UKF). It also deals with addition of noise measurements to camera and radar sensor measurements that aims to reduce Mean Squared Error (MSE) for the fused object after object tracking. The source code for the filtering techniques and noise generation scripts are built upon existing program by [RWTH Institute for Automotive Engineering](https://github.com/ika-rwth-aachen). This project is under the [ACDC Research Project Course](https://github.com/ika-rwth-aachen/acdc-research-projects) by the IKA, RWTH Aachen University. 
@@ -16,7 +16,7 @@ A detailed documentation regarding this project can be found [here]().
 
 1. Clone this repository with the contained submodules:
     ```bash
-    git clone --recurse-submodules https://github.com/Ihrer73/acdc.git
+    git clone --recurse-submodules https://github.com/mananvora/acdc.git
     ```
 
 2. Pull the Docker image that is needed to run our tasks.:
@@ -27,7 +27,7 @@ A detailed documentation regarding this project can be found [here]().
 3. In a terminal, navigate to the Docker directory of this repository and launch the ACDC Docker container with the provided run script:
     ```bash
     # acdc/docker
-    ./run.sh
+    ./ros1_run.sh
     ```
     Once you run this script, the docker container will start running. When this is done, proceed to the **Quick start** section. 
     
@@ -52,9 +52,12 @@ A detailed documentation regarding this project can be found [here]().
 
     Play bag files:
    ```bash
-   rosbag play -l ../bag/acdc_fusion_guidaance_noise.bag
+   rosbag play -l ../bag/Bagfiles_original/KF_bagfiles/acdc_fusion_guidance_noise_gaussian_noise.bag
+   or 
+   rosbag play -l ~/ws/bag/Bagfiles_original/KF_bagfiles/acdc_fusion_guidance_noise_gaussian_noise.bag
    ```
-
+	The structure of the bag files have been explained in [README_bagfiles_structure.md](https://github.com/mananvora/acdc/tree/main/bag/README_bagfiles_structure.md).
+	
 **Note:** The source code files *StateFuser.cpp* and *StatePredictor.cpp* must be changed for different filters. 
 
 ## License

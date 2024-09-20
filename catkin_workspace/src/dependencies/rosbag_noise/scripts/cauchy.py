@@ -37,7 +37,8 @@ from definitions.msg import IkaObjectList, IkaSensorStamp
 
 # to execute this script, build the catkin package with its dependencies.
 # then execute:
-#  rosrun rosbag_noise main.py bag_file.bag
+# rosrun rosbag_noise cauchy.py ~/ws/bag/bag/acdc_fusion_guidance.bag
+
 
 def make_noise(object_list, mode):
     noise_list = IkaObjectList()
@@ -117,7 +118,7 @@ def main():
     input_objectlist_topic = "/fusion/ikaObjectList"
     input_objectlist_topic_output = "/sensors/reference/ikaObjectList"
 
-    output_name = sys.argv[1][:-4] + '_cauchynosie.bag'
+    output_name = '~/ws/bag/bag/Bagfiles_original/KF_bagfiles/' + input_name.split('/')[-1][:-4] + '_cauchy_noise.bag'
     bag = rosbag.Bag(output_name, 'w')
     output_objectlist_topic_camera = '/sensors/camera_front/ikaObjectList'
     output_objectlist_topic_radar = '/sensors/radar_front/ikaObjectList'
