@@ -56,7 +56,13 @@ A detailed documentation regarding this project can be found [here]().
    or 
    rosbag play -l /home/rosuser/ws/bag/Bagfiles_original/KF_bagfiles/acdc_fusion_guidance_noise_gaussian_noise.bag
    ```
-  To find which bag file to be played please look into [README_bagfiles_structure.md](https://github.com/mananvora/acdc/tree/main/bag/README_bagfiles_structure.md).
+   
+  Record bag files: 
+     Launch and object_fusion_wrapper node:
+   ```bash
+   roslaunch object_fusion_wrapper record_and_play_fused_object.launch
+   ```
+  To find which bag file to be played please look into [README_bagfiles_structure.md](https://github.com/mananvora/acdc/blob/main/bag/README_bagfiles_structure.md?plain=1).
    
 - Recording of the bag files is further explained in [README.md](https://github.com/mananvora/acdc/tree/main/catkin_workspace/src/workshops/section_3/object_fusion_wrapper)
 

@@ -4,14 +4,15 @@ There exists two launch files in the launch directory of the object_fusion_wrapp
 This launch file is responsible for starting the object fusion node with the necessary configurations, allowing it to perform sensor fusion, likely within a simulation or data replay context from the bag files. 
 
 
-### play_record_bagfiles.launch
+### record_and_play_fused_object.launch
 The task of this launch file is to play a bag file and record specified topics into a new bag file
 Modicfications can be made to this file to run specific filtering techniques - KF/EKF/UKF and particular bag files with specific noise distributions.
+
 
 One can refer to the dtructure of the bagfiles firectory at [README_bagfiles_structure.md](https://github.com/mananvora/acdc/blob/main/bag/README_bagfiles_structure.md?plain=1)
 
 
-#### play bag file: 
+ **Play bag file:**
     ```xml
     <node pkg="rosbag" type="play" name="rosbag_play" args="-l /home/rosuser/ws/bag/Bagfiles_originial/*filter*/acdc_fusion_guidance_*noise*.bag"/>
     ```
@@ -30,7 +31,7 @@ Replace the '*noise*' with the noise name for whichever noise distribution has b
     
     example: bag file for EKF and gaussian noise distribution - /home/rosuser/ws/bag/Bagfiles_originial/EUKF/acdc_fusion_guidance_gaussian_noise.bag
 
-#### record bag file
+**Record bag file**
     ```xml
     <node pkg="rosbag" type="record" name="rosbag_record" args="-O /home/rosuser/ws/bag/Bagfiles_original/Recordings/*filter_dir*/recording_*noise*_*filter*.bag /acdc_fusion_guidance_*noise*.bag /sensors/fusion/ikaObjectList /sensors/reference/ikaObjectList"/>
     ```
