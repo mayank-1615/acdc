@@ -67,7 +67,7 @@ A detailed documentation regarding this project can be found [here]().
 - Recording of the bag files is further explained in [README.md](https://github.com/mananvora/acdc/tree/main/catkin_workspace/src/workshops/section_3/object_fusion_wrapper)
 
 
-**Note:** The source code files *StateFuser.cpp* and *StatePredictor.cpp* must be changed for different filters. This has explained [here](https://github.com/mananvora/acdc/blob/main/catkin_workspace/src/workshops/section_3/object_fusion/README.md)
+**Note:** The source code files *StateFuser.cpp* and *StatePredictor.cpp* must be changed for different filters. Further, the parameteres for fusion also have to be changed. This has explained [here](https://github.com/mananvora/acdc/blob/main/catkin_workspace/src/workshops/section_3/object_fusion/README.md)
 
 ## License
 
